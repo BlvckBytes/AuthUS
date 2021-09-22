@@ -1,0 +1,1477 @@
+openapi: "3.0.0"
+
+info:
+  description: "This is the api-contract that the MG-Auth service will implement"
+  version: "0.0.1"
+  title: "MG-Auth"
+
+paths:
+
+  #######################################
+  ##            Account CRUD           ##
+  #######################################
+
+  /accounts:
+    get:
+      tags:
+      - "account"
+      summary: "Fetch all existing accounts"
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/limitParam"
+        - $ref: "#/components/parameters/offsetParam"
+        - $ref: "#/components/parameters/sortByParam"
+        - $ref: "#/components/parameters/filterByParam"
+      responses:
+        "200":
+          description: "Fetched successfully"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/UserAccount"
+                  pageCursor:
+                    $ref: "#/components/schemas/PageCursor"
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+          
+    post:
+      tags:
+      - "account"
+      summary: "Create a new account"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserAccount"
+      responses:
+        "200":
+          description: "Created successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserAccount"
+        "400":
+          $ref: '#/components/responses/MalformedRequestError'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "406":
+          $ref: '#/components/responses/CollisionError'
+
+  /accounts/{id}:
+    get:
+      tags:
+      - "account"
+      summary: "Fetch an existing account"
+      security:
+        - bearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        description: "ID of the target account"
+        schema:
+          type: string
+        required: true
+      responses:
+        "200":
+          description: "Fetched successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserAccount"
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+
+    put:
+      tags:
+      - "account"
+      summary: "Change an existing account"
+      security:
+        - bearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        description: "ID of the target account"
+        schema:
+          type: string
+        required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserAccount"
+      responses:
+        "200":
+          description: "Updated successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserAccount"
+        "400":
+          $ref: '#/components/responses/MalformedRequestError'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "406":
+          $ref: '#/components/responses/CollisionError'
+          
+    delete:
+      tags:
+      - "account"
+      summary: "Delete an existing account"
+      security:
+        - bearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        description: "ID of the target account"
+        schema:
+          type: string
+        required: true
+      responses:
+        "204":
+          description: "Deleted successfully"
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+          
+  #######################################
+  ##       Explicit permissions        ##
+  #######################################
+
+  /account/{id}/permissions:
+    get:
+      tags:
+      - "account-permission"
+      summary: "Fetch all assigned permissions"
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: "ID of the target account"
+          schema:
+            type: string
+          required: true
+        - $ref: "#/components/parameters/limitParam"
+        - $ref: "#/components/parameters/offsetParam"
+        - $ref: "#/components/parameters/sortByParam"
+        - $ref: "#/components/parameters/filterByParam"
+      responses:
+        "200":
+          description: "Fetched successfully"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/AssignedPermission"
+                  pageCursor:
+                    $ref: "#/components/schemas/PageCursor"
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+          
+    post:
+      tags:
+      - "account-permission"
+      summary: "Assign a new permission to an account"
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: "ID of the target account"
+          schema:
+            type: string
+          required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AssignedPermissionInput"
+      responses:
+        "200":
+          description: "Created successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AssignedPermission"
+        "400":
+          $ref: '#/components/responses/MalformedRequestError'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "406":
+          $ref: '#/components/responses/CollisionError'
+          
+  /account/{id}/permissions/{pid}:
+    get:
+      tags:
+      - "account-permission"
+      summary: "Fetch an assigned permission"
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: "ID of the target account"
+          schema:
+            type: string
+          required: true
+        - name: pid
+          in: path
+          description: "ID of the target permission"
+          schema:
+            type: string
+          required: true
+      responses:
+        "200":
+          description: "Fetched successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AssignedPermission"
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+          
+    put:
+      tags:
+      - "account-permission"
+      summary: "Change an explicit permission assignment"
+      security:
+        - bearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        description: "ID of the target account"
+        schema:
+          type: string
+        required: true
+      - name: pid
+        in: path
+        description: "ID of the target permission"
+        schema:
+          type: string
+        required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AssignedPermissionMetadata"
+      responses:
+        "200":
+          description: "Updated successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AssignedPermission"
+        "400":
+          $ref: '#/components/responses/MalformedRequestError'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "406":
+          $ref: '#/components/responses/CollisionError'
+          
+    delete:
+      tags:
+      - "account-permission"
+      summary: "Delete an explicit permission assignment"
+      security:
+        - bearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        description: "ID of the target account"
+        schema:
+          type: string
+        required: true
+      - name: pid
+        in: path
+        description: "ID of the target permission"
+        schema:
+          type: string
+        required: true
+      responses:
+        "204":
+          description: "Deleted successfully"
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+          
+  /account/{id}/has-permission/{node}:
+    get:
+      tags:
+      - "account-permission"
+      summary: "Check if a user has a certain permission"
+      security:
+        - bearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        description: "ID of the target account"
+        schema:
+          type: string
+        required: true
+      - name: node
+        in: path
+        description: "Node of the target permission"
+        schema:
+          type: string
+        required: true
+      responses:
+        "204":
+          $ref: '#/components/responses/TrueBooleanResult'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "404":
+          $ref: '#/components/responses/FalseBooleanResult'
+          
+  #######################################
+  ##        Group memberships          ##
+  #######################################
+
+  /account/{id}/groups:
+    get:
+      tags:
+      - "account-group"
+      summary: "Fetch all memberships"
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: "ID of the target account"
+          schema:
+            type: string
+          required: true
+        - $ref: "#/components/parameters/limitParam"
+        - $ref: "#/components/parameters/offsetParam"
+        - $ref: "#/components/parameters/sortByParam"
+        - $ref: "#/components/parameters/filterByParam"
+      responses:
+        "200":
+          description: "Fetched successfully"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/AssignedPermission"
+                  pageCursor:
+                    $ref: "#/components/schemas/PageCursor"
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+          
+    post:
+      tags:
+      - "account-group"
+      summary: "Create a new membership"
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        description: "ID of the target account"
+        schema:
+          type: string
+        required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GroupMembershipInput"
+      responses:
+        "200":
+          description: "Created successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GroupMembership"
+        "400":
+          $ref: '#/components/responses/MalformedRequestError'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "406":
+          $ref: '#/components/responses/CollisionError'
+          
+  /account/{id}/groups/{gid}:
+    get:
+      tags:
+      - "account-group"
+      summary: "Fetch a membership"
+      security:
+        - bearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        description: "ID of the target account"
+        schema:
+          type: string
+        required: true
+      - name: gid
+        in: path
+        description: "ID of the target group"
+        schema:
+          type: string
+        required: true
+      responses:
+        "200":
+          description: "Fetched successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GroupMembership"
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+          
+    put:
+      tags:
+      - "account-group"
+      summary: "Change a membership"
+      security:
+        - bearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        description: "ID of the target account"
+        schema:
+          type: string
+        required: true
+      - name: gid
+        in: path
+        description: "ID of the target group"
+        schema:
+          type: string
+        required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GroupMembershipMetadata"
+      responses:
+        "200":
+          description: "Updated successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GroupMembership"
+        "400":
+          $ref: '#/components/responses/MalformedRequestError'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "406":
+          $ref: '#/components/responses/CollisionError'
+          
+    delete:
+      tags:
+      - "account-group"
+      summary: "Delete a membership"
+      security:
+        - bearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        description: "ID of the target account"
+        schema:
+          type: string
+        required: true
+      - name: gid
+        in: path
+        description: "ID of the target group"
+        schema:
+          type: string
+        required: true
+      responses:
+        "204":
+          description: "Deleted successfully"
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+
+  /account/{id}/in-group/{gid}:
+    get:
+      tags:
+      - "account-group"
+      summary: "Check if a membership exists"
+      security:
+        - bearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        description: "ID of the target account"
+        schema:
+          type: string
+        required: true
+      - name: gid
+        in: path
+        description: "ID of the target group"
+        schema:
+          type: string
+        required: true
+      responses:
+        "204":
+          $ref: '#/components/responses/TrueBooleanResult'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "404":
+          $ref: '#/components/responses/FalseBooleanResult'
+          
+  #######################################
+  ##        Session management         ##
+  #######################################
+
+  /sessions:
+    get:
+      tags:
+      - "account-session"
+      summary: "Get the current session"
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: "Fetched successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserSession"
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+          
+    post:
+      tags:
+      - "account-session"
+      summary: "Create a new session"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserCredentials"
+      responses:
+        "200":
+          description: "Created successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserSession"
+        "400":
+          $ref: '#/components/responses/MalformedRequestError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+          
+    delete:
+      tags:
+      - "account-session"
+      summary: "Close a session"
+      security:
+        - bearerAuth: []
+      responses:
+        "204":
+          description: "Closed successfully"
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+          
+  /sessions/refresh:
+    post:
+      tags:
+      - "account-session"
+      summary: "Refresh a session"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SessionRefresh"
+      responses:
+        "200":
+          description: "Created successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserSession"
+        "400":
+          $ref: '#/components/responses/MalformedRequestError'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+          
+  #######################################
+  ##      Permission management        ##
+  #######################################
+          
+  /permissions:
+    get:
+      tags:
+      - "permissions"
+      summary: "Fetch all permissions"
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/limitParam"
+        - $ref: "#/components/parameters/offsetParam"
+        - $ref: "#/components/parameters/sortByParam"
+        - $ref: "#/components/parameters/filterByParam"
+      responses:
+        "200":
+          description: "Fetched successfully"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Permission"
+                  pageCursor:
+                    $ref: "#/components/schemas/PageCursor"
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+          
+    post:
+      tags:
+      - "permissions"
+      summary: "Create a new permission"
+      security:
+      - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Permission"
+      responses:
+        "200":
+          description: "Created successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Permission"
+        "400":
+          $ref: '#/components/responses/MalformedRequestError'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "406":
+          $ref: '#/components/responses/CollisionError'
+          
+  /permissions/{pid}:
+    get:
+      tags:
+      - "permissions"
+      summary: "Fetch a permission"
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: pid
+          in: path
+          description: "ID of the target permission"
+          schema:
+            type: string
+          required: true
+      responses:
+        "200":
+          description: "Fetched successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Permission"
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+          
+    put:
+      tags:
+      - "permissions"
+      summary: "Change a permission"
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: pid
+          in: path
+          description: "ID of the target permission"
+          schema:
+            type: string
+          required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Permission"
+      responses:
+        "200":
+          description: "Updated successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Permission"
+        "400":
+          $ref: '#/components/responses/MalformedRequestError'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "406":
+          $ref: '#/components/responses/CollisionError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+          
+    delete:
+      tags:
+      - "permissions"
+      summary: "Delete a permission"
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: pid
+          in: path
+          description: "ID of the target permission"
+          schema:
+            type: string
+          required: true
+      responses:
+        "204":
+          description: "Deleted successfully"
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "406":
+          $ref: '#/components/responses/CollisionError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+          
+  #######################################
+  ##          Group management         ##
+  #######################################
+          
+  /groups:
+    get:
+      tags:
+      - "groups"
+      summary: "Fetch all groups"
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/limitParam"
+        - $ref: "#/components/parameters/offsetParam"
+        - $ref: "#/components/parameters/sortByParam"
+        - $ref: "#/components/parameters/filterByParam"
+      responses:
+        "200":
+          description: "Fetched successfully"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Group"
+                  pageCursor:
+                    $ref: "#/components/schemas/PageCursor"
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+          
+    post:
+      tags:
+      - "groups"
+      summary: "Create a new group"
+      security:
+      - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Group"
+      responses:
+        "200":
+          description: "Created successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Group"
+        "400":
+          $ref: '#/components/responses/MalformedRequestError'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "406":
+          $ref: '#/components/responses/CollisionError'
+          
+  /groups/{id}:
+    get:
+      tags:
+      - "groups"
+      summary: "Fetch a group"
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: "ID of the target group"
+          schema:
+            type: string
+          required: true
+      responses:
+        "200":
+          description: "Fetched successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Group"
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+          
+    put:
+      tags:
+      - "groups"
+      summary: "Change a group"
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: "ID of the target group"
+          schema:
+            type: string
+          required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Group"
+      responses:
+        "200":
+          description: "Updated successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Group"
+        "400":
+          $ref: '#/components/responses/MalformedRequestError'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "406":
+          $ref: '#/components/responses/CollisionError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+          
+    delete:
+      tags:
+      - "groups"
+      summary: "Delete a group"
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: "ID of the target group"
+          schema:
+            type: string
+          required: true
+      responses:
+        "204":
+          description: "Deleted successfully"
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "406":
+          $ref: '#/components/responses/CollisionError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+          
+  /groups/{id}/permissions:
+    get:
+      tags:
+      - "group-permissions"
+      summary: "Fetch all permissions of a group"
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: "ID of the target group"
+          schema:
+            type: string
+          required: true
+        - $ref: "#/components/parameters/limitParam"
+        - $ref: "#/components/parameters/offsetParam"
+        - $ref: "#/components/parameters/sortByParam"
+        - $ref: "#/components/parameters/filterByParam"
+      responses:
+        "200":
+          description: "Fetched successfully"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Permission"
+                  pageCursor:
+                    $ref: "#/components/schemas/PageCursor"
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+          
+    post:
+      tags:
+      - "group-permissions"
+      summary: "Assign a permission to a group"
+      security:
+      - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: "ID of the target group"
+          schema:
+            type: string
+          required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AssignedPermissionInput"
+      responses:
+        "200":
+          description: "Created successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AssignedPermission"
+        "400":
+          $ref: '#/components/responses/MalformedRequestError'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "406":
+          $ref: '#/components/responses/CollisionError'
+          
+  /groups/{id}/permissions/{pid}:
+    get:
+      tags:
+      - "group-permissions"
+      summary: "Fetch a permission of a group"
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: "ID of the target group"
+          schema:
+            type: string
+          required: true
+        - name: pid
+          in: path
+          description: "ID of the target permission"
+          schema:
+            type: string
+          required: true
+      responses:
+        "200":
+          description: "Fetched successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Permission"
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+          
+    put:
+      tags:
+      - "group-permissions"
+      summary: "Change a permission assignment"
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: "ID of the target group"
+          schema:
+            type: string
+          required: true
+        - name: pid
+          in: path
+          description: "ID of the target permission"
+          schema:
+            type: string
+          required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AssignedPermissionMetadata"
+      responses:
+        "200":
+          description: "Updated successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AssignedPermission"
+        "400":
+          $ref: '#/components/responses/MalformedRequestError'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "406":
+          $ref: '#/components/responses/CollisionError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+          
+    delete:
+      tags:
+      - "group-permissions"
+      summary: "Delete a permission from a group"
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: "ID of the target group"
+          schema:
+            type: string
+          required: true
+        - name: pid
+          in: path
+          description: "ID of the target permission"
+          schema:
+            type: string
+          required: true
+      responses:
+        "204":
+          description: "Deleted successfully"
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "406":
+          $ref: '#/components/responses/CollisionError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+          
+  /groups/{id}/parents:
+    get:
+      tags:
+      - "group-inheritances"
+      summary: "Fetch all parents of a group"
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: "ID of the target group"
+          schema:
+            type: string
+          required: true
+        - $ref: "#/components/parameters/limitParam"
+        - $ref: "#/components/parameters/offsetParam"
+        - $ref: "#/components/parameters/sortByParam"
+        - $ref: "#/components/parameters/filterByParam"
+      responses:
+        "200":
+          description: "Fetched successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GroupMembership"
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+          
+    post:
+      tags:
+      - "group-inheritances"
+      summary: "Assign a parent to a group"
+      security:
+      - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: "ID of the target group"
+          schema:
+            type: string
+          required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GroupMembershipInput"
+      responses:
+        "200":
+          description: "Created successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GroupMembership"
+        "400":
+          $ref: '#/components/responses/MalformedRequestError'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "406":
+          $ref: '#/components/responses/CollisionError'
+          
+  /groups/{id}/parents/{pid}:
+    get:
+      tags:
+      - "group-inheritances"
+      summary: "Fetch a parents of a group"
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: "ID of the target group"
+          schema:
+            type: string
+          required: true
+        - name: pid
+          in: path
+          description: "ID of the target parent group"
+          schema:
+            type: string
+          required: true
+      responses:
+        "200":
+          description: "Fetched successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GroupMembership"
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+          
+    put:
+      tags:
+      - "group-inheritances"
+      summary: "Change a parent membership"
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: "ID of the target group"
+          schema:
+            type: string
+          required: true
+        - name: pid
+          in: path
+          description: "ID of the target parent group"
+          schema:
+            type: string
+          required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GroupMembershipMetadata"
+      responses:
+        "200":
+          description: "Updated successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GroupMembership"
+        "400":
+          $ref: '#/components/responses/MalformedRequestError'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "406":
+          $ref: '#/components/responses/CollisionError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+          
+    delete:
+      tags:
+      - "group-inheritances"
+      summary: "Delete a parent from a group"
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: "ID of the target group"
+          schema:
+            type: string
+          required: true
+        - name: pid
+          in: path
+          description: "ID of the target parent group"
+          schema:
+            type: string
+          required: true
+      responses:
+        "204":
+          description: "Deleted successfully"
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "406":
+          $ref: '#/components/responses/CollisionError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  responses:
+    UnauthorizedError:
+      description: No valid authorization details provided
+      
+    CollisionError:
+      description: The requested values would create a model-collision
+      
+    MalformedRequestError:
+      description: Please check the Api-Doc for correct usage of this endpoing
+      
+    NotFoundError:
+      description: The requested resource has not been found on the server
+      
+    TrueBooleanResult:
+      description: The requested function yielded a positive result
+      
+    FalseBooleanResult:
+      description: The requested function yielded a negative result
+      
+  parameters:
+    
+      ######################
+      ##    PageCursor    ##
+      ######################
+  
+      limitParam:
+         name: limit
+         in: query
+         description: Limits the number of returned results
+         required: false
+         schema:
+            type: integer
+            
+      offsetParam:
+         name: offset
+         in: query
+         description: Offsets the first item responded from the top of available items
+         required: false
+         schema:
+            type: integer
+            
+      sortByParam:
+         name: sort_by
+         in: query
+         description: Custom key-based sorting request (i.e. +name,-age,-city,+zip)
+         required: false
+         schema:
+            type: string
+            
+      filterByParam:
+         name: filter_by
+         in: query
+         description: Custom key-based filter request (i.e. filter_by_name[eq]=bob)
+         required: false
+         schema:
+            type: string
+
+  schemas:
+  
+    ######################
+    ##     Utility      ##
+    ######################
+      
+    PageCursor:
+      type: object
+      properties:
+        limit:
+          readOnly: true
+          type: number
+        offset:
+          readOnly: true
+          type: number
+        sort_by:
+          readOnly: true
+          type: string
+        filter_by:
+          readOnly: true
+          type: string
+        responded_items:
+          readOnly: true
+          type: number
+        total_items:
+          readOnly: true
+          type: number
+          
+    ######################
+    ##     Account      ##
+    ######################
+  
+    UserAccount:
+      type: object
+      properties:
+        id:
+          readOnly: true
+          type: string
+        username:
+          type: string
+        password:
+          writeOnly: true
+          type: string
+        email:
+          type: string
+        joined:
+          readOnly: true
+          type: string
+          
+    UserSession:
+      type: object
+      properties:
+        issued_at:
+          type: string
+        valid_until:
+          type: string
+        holder_account_id:
+          type: string
+        active_permission_nodes:
+          type: array
+          items:
+            type: string
+        last_account_update:
+          type: string
+        access_token:
+          type: string
+        refresh_token:
+          type: string
+          
+    UserCredentials:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+          
+    SessionRefresh:
+      type: object
+      properties:
+        refresh_token:
+          type: string
+          
+    ######################
+    ##    Permissions   ##
+    ######################
+    
+    Permission:
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+        node:
+          type: string
+        description:
+          type: string
+          
+    AssignedPermissionMetadata:
+      type: object
+      properties:
+        validUntil:
+          type: string
+        negative:
+          type: boolean
+          
+    AssignedPermissionInput:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/AssignedPermissionMetadata'
+      properties:
+        id:
+          type: string
+          
+    AssignedPermission:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/Permission'
+        - $ref: '#/components/schemas/AssignedPermissionMetadata'
+
+    ######################
+    ##      Groups      ##
+    ######################
+    
+    Group:
+      type: object
+      properties:
+        id:
+          readOnly: true
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+          
+    GroupMembershipMetadata:
+      type: object
+      properties:
+        validUntil:
+          type: string
+    
+    GroupMembership:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/Group'
+        - $ref: '#/components/schemas/GroupMembershipMetadata'
+          
+    GroupMembershipInput:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/GroupMembershipMetadata'
+      properties:
+        id:
+          type: string
