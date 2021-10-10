@@ -4,14 +4,14 @@ plugins {
 
 dependencies {
     // Kotlin
-    implementation(kotlin("reflect"))
-    implementation(kotlin("stdlib"))
+    implementation("org.jetbrains.kotlin:kotlin-reflect:1.5.31")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.5.31")
 
     // Spring
-    implementation("org.springframework.boot:spring-boot-starter")
+    implementation("org.springframework.boot:spring-boot-starter:2.5.5")
 
     // Exposed datatypes
-    implementation("org.jetbrains.exposed:exposed-jodatime:0.29.1")
+    implementation("org.jetbrains.exposed:exposed-jodatime:0.35.1")
 
     // JWT
     implementation("at.favre.lib:bcrypt:0.9.0")
