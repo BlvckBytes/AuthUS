@@ -7,10 +7,11 @@ dependencies {
     implementation(project(":domain"))
     implementation(project(":infrastructure"))
     implementation(project(":rest"))
+    implementation(project(":graphql"))
 
     // Kotlin
     implementation(kotlin("reflect"))
-    implementation(kotlin("stdlib-jdk8"))
+    implementation(kotlin("stdlib"))
 
     // Spring web
     implementation("org.springframework.boot:spring-boot-starter-web")
