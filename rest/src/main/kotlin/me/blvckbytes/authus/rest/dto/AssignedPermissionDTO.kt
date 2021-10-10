@@ -9,7 +9,6 @@ class AssignedPermissionDTO(
     @field:NotNull
     var id: UUID?,
 
-    @field:NotNull
     var node: String?,
     var description: String?,
 

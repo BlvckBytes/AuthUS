@@ -10,7 +10,7 @@ class TomcatConfig : WebServerFactoryCustomizer<TomcatServletWebServerFactory> {
 
     override fun customize(factory: TomcatServletWebServerFactory?) {
         factory?.addConnectorCustomizers(TomcatConnectorCustomizer { connector ->
-            connector.setAttribute("relaxedQueryChars", "<>[\\]^`{|}")
+            connector.setProperty("relaxedQueryChars", "<>[\\]^`{|}")
         })
     }
 }
