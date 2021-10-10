@@ -3,15 +3,20 @@ plugins {
 }
 
 dependencies {
+    // Modules
     implementation(project(":domain"))
     implementation(project(":infrastructure"))
-    implementation(project(":application"))
+    implementation(project(":rest"))
 
+    // Kotlin
     implementation(kotlin("reflect"))
     implementation(kotlin("stdlib-jdk8"))
 
+    // Spring web
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter")
+
+    // Spring junit testing with rest-assured and sql-containers
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.3.1")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.3.1")
     testImplementation("io.rest-assured:rest-assured")

@@ -2,16 +2,12 @@ package me.blvckbytes.authus
 
 import io.restassured.builder.ResponseSpecBuilder
 import io.restassured.specification.ResponseSpecification
-import me.blvckbytes.authus.application.dto.PermissionDTO
-import me.blvckbytes.authus.domain.model.util.SortDirection
+import me.blvckbytes.authus.rest.dto.PermissionDTO
 import me.blvckbytes.authus.util.ITBase
 import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus
 import java.util.*
-import kotlin.Comparator
-import kotlin.reflect.KMutableProperty
-import kotlin.reflect.KMutableProperty1
 
 class PermissionsIT : ITBase() {
 

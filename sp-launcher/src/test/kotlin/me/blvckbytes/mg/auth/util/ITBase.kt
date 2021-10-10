@@ -4,7 +4,7 @@ import io.restassured.RestAssured
 import io.restassured.RestAssured.given
 import io.restassured.http.ContentType
 import io.restassured.specification.RequestSpecification
-import me.blvckbytes.authus.MGAuthApplication
+import me.blvckbytes.authus.AuthUSApplication
 import me.blvckbytes.authus.infrastructure.DatabaseConnection
 import org.junit.jupiter.api.BeforeEach
 import org.junit.runner.RunWith
@@ -25,7 +25,7 @@ import kotlin.random.Random
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
 
     // Loading context configuration and bootstrapper
-    classes = [ ITBase.ContextConfiguration::class, MGAuthApplication::class ]
+    classes = [ ITBase.ContextConfiguration::class, AuthUSApplication::class ]
 )
 open class ITBase {
 
